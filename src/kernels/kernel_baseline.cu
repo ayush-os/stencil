@@ -11,12 +11,18 @@ __global__ void baseline_elementwise_kernel(float *output, const float *input,
   if (threadId >= N)
     return;
 
-  if (threadId == N) {
-    output[threadId] = input[threadId] + input[threadId + 1];
-  } else if (threadId == 0) {
-    output[threadId] = input[threadId] + input[threadId + 1];
-  } else {
-    output[threadId] =
-        input[threadId - 1] + input[threadId] + input[threadId + 1];
+  int i_minus_1 = threadId - 1;
+  int i_plus_1 = threadId + 1;
+
+  float sum = input[threadId];
+
+  if (i_minus_1 >= 0) {
+    sum += input[i_minus_1];
   }
+
+  if (i_plus_1 < N) {
+    sum += input[i_plus_1];
+  }
+
+  output[threadId] = sum;
 }
